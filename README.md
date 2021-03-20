@@ -1,4 +1,6 @@
-# Vowpal Platypus <a href="https://github.com/peterhurford/vowpal_platypus/blob/master/CHANGELOG.md"><img src="https://img.shields.io/github/tag/peterhurford/vowpal_platypus.svg"></a>
+# Vowpal Platypus <a href="https://github.com/peterhurford/vowpal_platypus/blob/master/CHANGELOG.md"><img src="https://img.shields.io/github/tag/peterhurford/vowpal_platypus.svg"></a> [![Travis](https://img.shields.io/travis/peterhuford/vowpal_platypus.svg)]()
+
+![](http://i.imgur.com/lyjeSww.jpg)
 
 **Vowpal Platypus** is a lightweight Python wrapper built on [Vowpal Wabbit](https://github.com/JohnLangford/vowpal_wabbit/), that uses online learning to acheive great results.
 
@@ -7,7 +9,7 @@ VP is...
 * **...fast,** generating [MovieLens predictions](https://github.com/peterhurford/v_examples/blob/master/als/vp/runner.py) with just a few _nanoseconds_ per prediction on a 40 core EC2.
 * **...accurate,** acheiving AUC > 0.9 with [a Titanic model](https://github.com/peterhurford/v_examples/blob/master/titanic/vp/kaggle.py) that processes, trains, and predicts all in under a second on a laptop.
 * **...lightweight,** with no dependencies other than Python, installing on a Macbook pro in 0.3 seconds.
-* **...multicore,** scaling linearly across any number of cores, being used for hundreds of GB of data.
+* **...multicore,** scaling linearly across any number of cores and machines, capable of parallel processing on hundreds of GB of data without sacrificing model accuracy.
 * **...out-of-core,** bottlenecked by CPU and IO rather than RAM.
 
 **[See demo code here](https://github.com/peterhurford/v_examples)** showing detailed implementations and benchmarks for MovieLens ALS, Criteo ad click prediction, NumerAI stock prediction, and Titanic survival.
@@ -39,7 +41,6 @@ def process_line(item):
     item = item.split(',')  # CSV is comma separated, so we unseparate it.
     features = [            # A set of features for VW to operate on.
                  'passenger_class_' + clean(item[2]),  # VP accepts individual strings as features.
-                 'last_name_' + clean(item[3]),
                  {'gender': 0 if item[5] == 'male' else 1},  # Or VP can take a dict with a number.
                  {'siblings_onboard': int(item[7])},
                  {'family_members_onboard': int(item[8])},
@@ -49,9 +50,6 @@ def process_line(item):
     title = item[4].split(' ')
     if len(title):
         features.append('title_' + title[1])  # Add a title feature if they have one.
-    age = item[6]
-    if age.isdigit():
-        features.append({'age': int(item[6])})
     return {    # VW needs to process a dict with a label and then any number of feature sets.
         'label': int(item[1] == '1'),
         'f': features   # The name 'f' for our feature set is arbitrary, but is the same as the 'ff' above that creates quadratic features.
@@ -69,6 +67,19 @@ run(logistic_regression(name='Titanic',    # Gives a name to the model file.
 ```
 
 This produces a Titanic survival model with an AUC of 0.7241 (on the Kaggle holdout validation set) in 0.16sec.
+
+
+## Benchmarks
+
+As they say, "all benchmarks are wrong, but some are useful". Beware of "lies, damned lies, and benchmarks". That being said, here are some benchmarks on the Kaggle Titanic dataset. [Scripts and configurations are here](https://github.com/peterhurford/vp_examples/tree/master/titanic) and benchmarks are done on a 2.5GHz, 16GB RAM Mid-2015 Macbook Pro with OS 10.11.6.
+
+| Algorithm                   | Time    | AUC   |
+| --------------------------- | ------- | ----- |
+| Pyspark Logistic Regression | 12.466s | 0.777 |
+| Python XGBoost              | 0.532s  | 0.737 |
+| Sklearn Logistic Regression | 0.512s  | 0.811 |
+| VW                          | 0.437s | 0.746 |
+| VP Logistic Regression      | 0.211s | 0.896 |
 
 
 ## Multicore Capabilities

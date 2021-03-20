@@ -1,3 +1,43 @@
+## v2.2
+
+**Major-ish Changes**
+
+* Python 3 is now supported (TODO).
+* A VP model can now be spanned across multiple machines in a network.
+* FTRL modeling is now supported. Use `ftrl` for the interface.
+* `run` now supports predicting without training and training without predicting.
+* Models now have `get_beta_weights` function that tells you the weights of the model. Use `model.get_beta_weights(read=False)` to write out the `.weights` file for inspection or `model.get_beta_weights()` (`read=True` by default) to return a list of weight data in memory.
+* `data_file=True` parameter will keep a VW-format data file of all input.
+* `ngram` and `skipgram` can now be set.
+* `autolink` is now supported.
+* `affix` is now supported.
+* A `daemon` can be started from referencing a model file explicitly.
+* `split_object` can split a list or a dictionary into multiple parts for spreading across cores.
+* `cost_rate` is now a validation metric that creates a weighted rate of false negative and false positive cost.
+* `auc` now takes a threshold by default. `threshold=None` will not use it.
+* Error handling introduced in v2.1.1 is expanded to all functions (TODO). Fully resolves issues #1 and #6.
+* Shuffle files are automatically cleaned after if `clean` is not `False` (TODO).
+* If shuffle files are found, they won't be remade unless `force` is `True` (TODO).
+
+**Minor/Technical Changes**
+
+* Adds a test suite (TODO).
+* Extends error handling to `run` function (TODO).
+* VW models have a nice printed name.
+* All VW processes are spun down on run completion (TODO for non run_parallel).
+* Daemons no longer use the node to calculate the port if port is passed in as an argument.
+* Clear error messages now exist for VP input.
+* Adds Travis.
+
+**Bugfixes**
+
+* Correctly predicts with a daemon on a single dictionary.
+* Errors clearly if the model name has a string. Resolves issue #12.
+* The daemon can now render predictions outside of the range [-1, 1].
+* `:` and `|` are explicitly disallowed as inputs (TODO).
+
+-
+
 #### v2.1.5
 
 * Fix a bug in how MCC and Average Accuracy are calculated. >.<
@@ -21,8 +61,8 @@
 * Allow custom port to be specified for a daemon.
 * Switch to using Pathos library for multiprocessing.
 * Fixed bugs in creating and using daemons for predictions.
-* An error that occurs on a particular core is now captured and printed clearly to the user.
-* The spanning tree now spins down when an error occurs, preventing further errors occuring from trying to reconnect to a spanning tree.
+* When using `run_parallel` error that occurs on a particular core is now captured and printed clearly to the user.
+* The spanning tree now spins down when an error occurs, preventing further errors occuring from trying to reconnect to a spanning tree. Resolves #1 and #6 for `run_parallel`.
 
 ## v2.1
 

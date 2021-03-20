@@ -20,24 +20,23 @@ class VPLogger:
     Basic logger functionality; replace this with a real logger of your choice
     """
     def debug(self, s):
-        print '[DEBUG] %s' % s
+        print('[DEBUG] %s' % s)
 
     def info(self, s):
-        print '[INFO] %s' % s
+        print('[INFO] %s' % s)
 
     def warning(self, s):
-        print '[WARNING] %s' % s
+        print('[WARNING] %s' % s)
 
     def error(self, s):
-        print '[ERROR] %s' % s
+        print('[ERROR] %s' % s)
 
 
-@retry(wait_random_min=1000, wait_random_max=2000, stop_max_attempt_number=4)
-def netcat(hostname, port, content, quiet=False):
+def netcat(port, content, quiet=False):
     if not quiet:
         print('Connecting to port {}'.format(port))
-    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    s.connect((hostname, port))
+    s = socket.socket()
+    s.connect(('', port))
     s.sendall(content.encode('utf-8'))
     s.shutdown(socket.SHUT_WR)
     data = []
@@ -48,14 +47,13 @@ def netcat(hostname, port, content, quiet=False):
         datum = datum.split('\n')
         for dat in datum:
             if dat != '':
-                dat = float(dat)
-                if 1 >= dat >= -1:  #TODO: Parameterize
-                    data.append(dat)
+                data.append(float(dat))
     s.close()
     return data
 
 
 def to_str(s):
+    """Convert to a string if it is not already a string. Useful for working around unicode issues."""
     if isinstance(s, basestring):
         return s
     else:
@@ -67,5 +65,9 @@ def vw_hash_process_key(key):
             return ' '.join(map(vw_hash_process_key, key))
         return ' '.join(map(to_str, key))
     if isinstance(key, dict):
+        if not all(map(lambda x: isinstance(x, int) or isinstance(x, float), key.values())):
+            raise ValueError('Named values passed to VP must be numeric.')
+        if not all(map(lambda x: isinstance(x, basestring), key.keys())):
+            raise ValueError('Named values passed to VP must have strings for names.')
         return ' '.join([to_str(k) + ':' + to_str(v) for (k, v) in key.iteritems()])
     return to_str(key)

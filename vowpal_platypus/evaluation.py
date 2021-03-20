@@ -23,6 +23,12 @@ def false_negatives(results, threshold=0.5):
 def false_positives(results, threshold=0.5):
     return sum(map(lambda x: x[0] >= threshold, filter(lambda x: x[1] == 0, results)))
 
+def cost_rate(results, false_negative_cost=1, false_positive_cost=1, threshold=0.5):
+    fp = false_positives(results, threshold=threshold)
+    fn = false_negatives(results, threshold=threshold)
+    n = len(results)
+    return ((fp * false_positive_cost) + (fn * false_negative_cost)) / float(n)
+
 def confusion_matrix(results, threshold=0.5):
     return {
         'TP': true_positives(results, threshold=threshold),
@@ -97,7 +103,7 @@ def average_accuracy(results, threshold=0.5):
     return 0.5 * ((tpc / float(tpc + fnc)) + (tnc / float(tnc + fpc)))
 
 
-def auc(results):
+def auc(results, threshold=0.5):
     def _tied_rank(x):
         sorted_x = sorted(zip(x,range(len(x))))
         r = [0 for k in x]
@@ -123,6 +129,9 @@ def auc(results):
                (num_negative*num_positive))
         return auc
 
-    preds = map(lambda x: x[0], results)
+    if threshold:
+        preds = map(lambda y: 1 if y >= threshold else 0, map(lambda x: x[0], results))
+    else:
+        preds = map(lambda x: x[0], results)
     actuals = map(lambda x: x[1], results)
     return _auc(actuals, preds)
