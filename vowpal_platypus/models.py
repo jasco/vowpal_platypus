@@ -1,4 +1,4 @@
-from vw import VW
+from .vw import VW
 
 def vw_model(model_params, node=False):
     params = model_params.copy()

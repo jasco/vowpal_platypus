@@ -1,5 +1,5 @@
-from internal import VPLogger
-from utils import safe_remove, shuffle_file, split_file, vw_hash_to_vw_str
+from .internal import VPLogger
+from .utils import safe_remove, shuffle_file, split_file, vw_hash_to_vw_str
 
 import os
 import sys

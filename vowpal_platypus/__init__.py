@@ -1,1 +1,1 @@
-from vw import *
+from .vw import *

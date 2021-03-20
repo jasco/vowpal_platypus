@@ -1,4 +1,4 @@
-from internal import get_os, vw_hash_process_key, to_str
+from .internal import get_os, vw_hash_process_key, to_str
 
 import re
 import math

@@ -1,6 +1,6 @@
-from internal import netcat
-from utils import vw_hash_to_vw_str
-from vw import VW
+from .internal import netcat
+from .utils import vw_hash_to_vw_str
+from .vw import VW
 
 def daemon(model, port=None, num_children=1):
     if isinstance(model, basestring):
