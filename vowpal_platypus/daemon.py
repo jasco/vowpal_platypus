@@ -3,7 +3,7 @@ from .utils import vw_hash_to_vw_str
 from .vw import VW
 
 def daemon(model, port=None, num_children=1):
-    if isinstance(model, basestring):
+    if isinstance(model, str):
         model_handle = model.split('.')[0]
         model_file = model
     else:

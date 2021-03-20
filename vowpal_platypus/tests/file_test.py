@@ -5,13 +5,13 @@ from vowpal_platypus.utils import shuffle_file, safe_remove, split_file
 
 def test_shuffle_file():
     with open('/tmp/testfile.dat', 'w') as filehandle:
-        filehandle.write('\n'.join(map(str, range(10000))))
+        filehandle.write('\n'.join(map(str, list(range(10000)))))
     shuffled_file = shuffle_file('/tmp/testfile.dat')
-    contents = map(int, open(shuffled_file, 'r').readlines())
+    contents = list(map(int, open(shuffled_file, 'r').readlines()))
     os.remove('/tmp/testfile.dat')
     os.remove(shuffled_file)
     assert len(contents) == 10000
-    assert contents != range(10000)
+    assert contents != list(range(10000))
 
 def test_safe_remove_file():
     open('/tmp/testfile.dat', 'w')
@@ -40,11 +40,11 @@ def test_safe_remove_glob():
 
 def test_split_file():
     with open('/tmp/testfile.dat', 'w') as filehandle:
-        filehandle.write('\n'.join(map(str, range(10000))))
+        filehandle.write('\n'.join(map(str, list(range(10000)))))
     split_files = split_file('/tmp/testfile.dat', num_cores=10)
     contents = [open(f, 'r').readlines() for f in split_files]
     assert len(contents) == 10
     assert len(contents[0]) == 1000
-    assert map(int, contents[0][0:10]) == range(10)
+    assert list(map(int, contents[0][0:10])) == list(range(10))
     os.remove('/tmp/testfile.dat')
     [os.remove(f) for f in split_files]

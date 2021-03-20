@@ -38,18 +38,18 @@ class VW:
                     'num_children': None, 'data_file': False, 'ngram': None, 'skipgram': None,
                     'autolink': None, 'ftrl': False, 'ftrl_alpha': None, 'ftrl_beta': None,
                     'affix': None}
-        for param_name in params.keys():
-            if param_name not in defaults.keys():
+        for param_name in list(params.keys()):
+            if param_name not in list(defaults.keys()):
                 raise ValueError('{} is not a supported VP parameter.'.format(param_name))
         self.params = params
-        for (param_name, default_value) in defaults.iteritems():
+        for (param_name, default_value) in defaults.items():
             if default_value is not None:
                 if self.params.get(param_name) is None:
                     self.params[param_name] = default_value
 
         self.state = 'ready'
         assert self.params.get('name') is not None, 'A VP model must have a name.'
-        assert isinstance(self.params['name'], basestring), 'The VP model must be a string.'
+        assert isinstance(self.params['name'], str), 'The VP model must be a string.'
         assert ' ' not in self.params['name'], 'A VP model name cannot contain a space character.'
         if not self.params.get('daemon'):
             assert self.params.get('passes') is not None, 'Please specify a value for number of passes.'
@@ -256,7 +256,7 @@ class VW:
 
 
     def train_on(self, filename, line_function, evaluate_function=None, header=True):
-        hyperparams = [k for (k, p) in self.params.iteritems() if isinstance(p, list) and k not in ['quadratic', 'cubic', 'ngram', 'skipgram']]
+        hyperparams = [k for (k, p) in self.params.items() if isinstance(p, list) and k not in ['quadratic', 'cubic', 'ngram', 'skipgram']]
         if len(hyperparams):
             if evaluate_function is None:
                 raise ValueError("evaluate_function must be defined in order to hypersearch.")
@@ -276,7 +276,7 @@ class VW:
                     if hypermax / float(hypermin) > 100:
                         param_range = [10 ** x for x in range(int(math.log10(hypermin)), int(math.log10(hypermax)) + 1)]
                     else:
-                        param_range = range(int(hypermin), int(hypermax) + 1)
+                        param_range = list(range(int(hypermin), int(hypermax) + 1))
                 else:
                     param_range = self.params[hyperparam]
                 best_value = None
@@ -356,7 +356,7 @@ class VW:
                     self.push_instance(item)
         preds = self.read_predictions()
         if len(actuals) == len(preds):
-            results = zip(preds, actuals)
+            results = list(zip(preds, actuals))
             if evaluate_function is not None:
                 print('Evaluated to: ' + str(evaluate_function(results)))
             return results
@@ -365,7 +365,7 @@ class VW:
 
     def parse_prediction(self, p):
         if self.params.get('lda'):
-            return map(float, p.split())
+            return list(map(float, p.split()))
         else:
             return float(p.split()[0])
 
@@ -436,7 +436,7 @@ class VW:
                 weights = weights_file_handle.readlines()
                 weights = weights[11:] # Throw out metadata
                 weights = [{'name': y[0], 'weight': y[2][:-1]} for y in [x.split(':') for x in weights]]
-                weights = filter(lambda x: x['weight'] != 0, weights)
+                weights = [x for x in weights if x['weight'] != 0]
                 weights_file_handle.close()
                 if clean_file:
                     safe_remove(weights_file)

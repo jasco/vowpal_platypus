@@ -54,20 +54,20 @@ def netcat(port, content, quiet=False):
 
 def to_str(s):
     """Convert to a string if it is not already a string. Useful for working around unicode issues."""
-    if isinstance(s, basestring):
+    if isinstance(s, str):
         return s
     else:
         return str(s)
 
 def vw_hash_process_key(key):
     if isinstance(key, list):
-        if any(map(lambda x: isinstance(x, (list, dict)), key)):
+        if any([isinstance(x, (list, dict)) for x in key]):
             return ' '.join(map(vw_hash_process_key, key))
         return ' '.join(map(to_str, key))
     if isinstance(key, dict):
-        if not all(map(lambda x: isinstance(x, int) or isinstance(x, float), key.values())):
+        if not all([isinstance(x, int) or isinstance(x, float) for x in list(key.values())]):
             raise ValueError('Named values passed to VP must be numeric.')
-        if not all(map(lambda x: isinstance(x, basestring), key.keys())):
+        if not all([isinstance(x, str) for x in list(key.keys())]):
             raise ValueError('Named values passed to VP must have strings for names.')
-        return ' '.join([to_str(k) + ':' + to_str(v) for (k, v) in key.iteritems()])
+        return ' '.join([to_str(k) + ':' + to_str(v) for (k, v) in key.items()])
     return to_str(key)

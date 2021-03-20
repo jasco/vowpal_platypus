@@ -1,27 +1,27 @@
 from math import sqrt, log
 
 def log_loss(results):
-     predicted = [min([max([x, 1e-15]), 1-1e-15]) for x in map(lambda x: float(x[0]), results)]
-     target = [min([max([x, 1e-15]), 1-1e-15]) for x in map(lambda x: float(x[1]), results)]
-     return -(1.0 / len(target)) * sum([target[i] * log(predicted[i]) + (1.0 - target[i]) * log(1.0 - predicted[i]) for i in xrange(len(target))])
+     predicted = [min([max([x, 1e-15]), 1-1e-15]) for x in [float(x[0]) for x in results]]
+     target = [min([max([x, 1e-15]), 1-1e-15]) for x in [float(x[1]) for x in results]]
+     return -(1.0 / len(target)) * sum([target[i] * log(predicted[i]) + (1.0 - target[i]) * log(1.0 - predicted[i]) for i in range(len(target))])
 
 def rmse(results):
-    return (sum(map(lambda x: (x[1] - x[0]) ** 2, results)) / float(len(results))) ** 0.5
+    return (sum([(x[1] - x[0]) ** 2 for x in results]) / float(len(results))) ** 0.5
 
 def percent_correct(results, threshold=0.5):
-    return sum(map(lambda x: x[1] == (0 if x[0] < threshold else 1), results)) / float(len(results))
+    return sum([x[1] == (0 if x[0] < threshold else 1) for x in results]) / float(len(results))
 
 def true_positives(results, threshold=0.5):
-    return sum(map(lambda x: x[0] >= threshold, filter(lambda x: x[1] == 1, results)))
+    return sum([x[0] >= threshold for x in [x for x in results if x[1] == 1]])
 
 def true_negatives(results, threshold=0.5):
-    return sum(map(lambda x: x[0] < threshold, filter(lambda x: x[1] == 0, results)))
+    return sum([x[0] < threshold for x in [x for x in results if x[1] == 0]])
 
 def false_negatives(results, threshold=0.5):
-    return sum(map(lambda x: x[0] < threshold, filter(lambda x: x[1] == 1, results)))
+    return sum([x[0] < threshold for x in [x for x in results if x[1] == 1]])
 
 def false_positives(results, threshold=0.5):
-    return sum(map(lambda x: x[0] >= threshold, filter(lambda x: x[1] == 0, results)))
+    return sum([x[0] >= threshold for x in [x for x in results if x[1] == 0]])
 
 def cost_rate(results, false_negative_cost=1, false_positive_cost=1, threshold=0.5):
     fp = false_positives(results, threshold=threshold)
@@ -105,7 +105,7 @@ def average_accuracy(results, threshold=0.5):
 
 def auc(results, threshold=0.5):
     def _tied_rank(x):
-        sorted_x = sorted(zip(x,range(len(x))))
+        sorted_x = sorted(zip(x,list(range(len(x)))))
         r = [0 for k in x]
         cur_val = sorted_x[0][0]
         last_rank = 0
@@ -130,8 +130,8 @@ def auc(results, threshold=0.5):
         return auc
 
     if threshold:
-        preds = map(lambda y: 1 if y >= threshold else 0, map(lambda x: x[0], results))
+        preds = [1 if y >= threshold else 0 for y in [x[0] for x in results]]
     else:
-        preds = map(lambda x: x[0], results)
-    actuals = map(lambda x: x[1], results)
+        preds = [x[0] for x in results]
+    actuals = [x[1] for x in results]
     return _auc(actuals, preds)
