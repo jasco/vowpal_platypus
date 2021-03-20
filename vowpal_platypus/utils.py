@@ -6,6 +6,7 @@ import os
 import collections
 
 def mean(x):
+    x = list(x)
     return sum(x) / float(len(x))
 
 
